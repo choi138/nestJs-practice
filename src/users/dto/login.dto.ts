@@ -1,18 +1,16 @@
 import { IsEmail, IsEnum, IsString } from "class-validator";
+import { MutationOutput } from "src/common/dto/output.dto";
 import { User } from "../entities/user.entity";
 
-enum UserRole {
-    Client = 'client',
-    Owner = 'owner'
-}
 
-export class CreateAccount {
+export class LoginInput {
     @IsEmail()
     email: string;
 
     @IsString()
     password: string;
+}
 
-    @IsString()
-    role: UserRole
+export class LoginOutput extends MutationOutput {
+    token?: string;
 }

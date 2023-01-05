@@ -1,22 +1,28 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAccount } from './dto/create-account.dto';
+import { LoginInput } from './dto/login.dto';
 import { User } from './entities/user.entity';
+import { JwtService } from 'src/jwt/jwt.service';
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectRepository(User) private readonly user: Repository<User>) { }
+    constructor(
+        @InjectRepository(User) private readonly users: Repository<User>,
+        private readonly jwtService: JwtService
+    ) { }
+
     async createUser({ email, password, role }: CreateAccount): Promise<{ ok: boolean, error?: string }> {
         try {
-            const exits = await this.user.findOne({ where: { email } })
+            const exits = await this.users.findOne({ where: { email } })
             if (exits) {
                 return ({
                     ok: false,
                     error: "There is a user with that email already"
                 })
             }
-            await this.user.save(this.user.create({ email, password, role }))
+            await this.users.save(this.users.create({ email, password, role }))
             return ({ ok: true })
         } catch (err) {
             console.log(err)
@@ -29,14 +35,43 @@ export class UsersService {
 
     async findById(id: number): Promise<User> {
         try {
-            const find = await this.user.findOne({ where: { id } })
+            const find = await this.users.findOne({ where: { id } })
             if (!find) {
-                throw new InternalServerErrorException();
+                throw new NotFoundException();
             }
             return find
         } catch (err) {
             console.log(err)
             throw new InternalServerErrorException()
+        }
+    }
+
+    async login({ email, password }: LoginInput): Promise<{ ok: boolean, error?: string, token?: string }> {
+        try {
+            const user = await this.users.findOne({ where: { email } });
+            if (!user) {
+                return {
+                    ok: false,
+                    error: "User not found"
+                }
+            }
+            const passwordCorrect = await user.checkPassword(password)
+            if (!passwordCorrect) {
+                return {
+                    ok: false,
+                    error: "Wrong password"
+                }
+            }
+            const tokens = this.jwtService.sign(user.id);
+            return {
+                ok: true,
+                token: tokens
+            }
+        } catch (err) {
+            return {
+                ok: false,
+                error: "Couldn't login"
+            }
         }
     }
 }

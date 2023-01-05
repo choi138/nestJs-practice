@@ -4,6 +4,7 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi'
 import { User } from './users/entities/user.entity';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
@@ -29,10 +30,13 @@ import { User } from './users/entities/user.entity';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV != 'prod',
-      logging: process.env.NODE_ENV != 'prod', 
+      // logging: process.env.NODE_ENV != 'prod', 
       entities: [User],
     }),
-    UsersModule
+    JwtModule.forRoot({
+      privateKey: process.env.SECRET_KEY
+    }),
+    UsersModule,
   ],
   controllers: [],
   providers: [],
