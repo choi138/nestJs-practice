@@ -16,4 +16,5 @@ export class User extends CoreEntity {
 
     @Column({type: 'enum', enum: UserRole})
     role: UserRole
+
 }

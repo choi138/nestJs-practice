@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { MutationOutput } from 'src/common/dto/output.dto';
 import { CoreEntity } from 'src/common/entites/core.entity';
 import { CreateAccount } from './dto/create-account.dto';
@@ -18,5 +18,10 @@ export class UsersController {
                 ok: false
             }
         }
+    }
+
+    @Get('/:id')
+    user(@Param('id') userId: number) {
+        return this.userService.findById(userId);
     }
 }

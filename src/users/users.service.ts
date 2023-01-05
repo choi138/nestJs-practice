@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAccount } from './dto/create-account.dto';
@@ -17,13 +17,26 @@ export class UsersService {
                 })
             }
             await this.user.save(this.user.create({ email, password, role }))
-            return({ok: true})
+            return ({ ok: true })
         } catch (err) {
             console.log(err)
             return ({
                 ok: false,
                 error: "Couldn't make account"
             })
+        }
+    }
+
+    async findById(id: number): Promise<User> {
+        try {
+            const find = await this.user.findOne({ where: { id } })
+            if (!find) {
+                throw new InternalServerErrorException();
+            }
+            return find
+        } catch (err) {
+            console.log(err)
+            throw new InternalServerErrorException()
         }
     }
 }

@@ -1,3 +1,4 @@
+import { IsEnum, IsString } from "class-validator";
 import { User } from "../entities/user.entity";
 
 enum UserRole {
@@ -6,9 +7,12 @@ enum UserRole {
 }
 
 export class CreateAccount {
+    @IsString()
     email: string;
 
+    @IsString()
     password: string;
 
+    @IsEnum(UserRole)
     role: UserRole
 }
