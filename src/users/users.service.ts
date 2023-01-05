@@ -74,4 +74,17 @@ export class UsersService {
             }
         }
     }
+
+    async use(token: string) {
+        const decoded = this.jwtService.verify(token)
+        try {
+            // console.log(decoded)
+            const user = await this.findById(decoded['id'])
+            // console.log(user)
+            return ("email: " + user.email + " " + "password:" + user.password)
+        } catch (err) {
+            console.log(err)
+            throw new NotFoundException()
+        }
+    }
 }

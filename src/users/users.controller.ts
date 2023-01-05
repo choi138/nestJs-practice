@@ -28,14 +28,27 @@ export class UsersController {
     @Post('/login')
     async login(@Body() loginInput: LoginInput): Promise<LoginOutput> {
         try {
-            const login =  this.userService.login(loginInput);
+            const login = this.userService.login(loginInput);
             return login;
-            
+
         } catch (err) {
             return {
                 ok: false,
                 error: err
             }
+        }
+    }
+
+    @Post('/token')
+    async Entoken(@Body() body:any) {
+        try {
+            return await this.userService.use(body.token)
+        } catch (err) {
+            console.log(err)
+            return ({
+                ok: "sorry",
+                error: err
+            });
         }
     }
 }
