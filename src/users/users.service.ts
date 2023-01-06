@@ -5,6 +5,7 @@ import { CreateAccount } from './dto/create-account.dto';
 import { LoginInput } from './dto/login.dto';
 import { User } from './entities/user.entity';
 import { JwtService } from 'src/jwt/jwt.service';
+import { UpdateAccount } from './dto/update-account.dto';
 
 @Injectable()
 export class UsersService {
@@ -34,15 +35,52 @@ export class UsersService {
     }
 
     async findById(id: number): Promise<User> {
+        return await this.users.findOne({ where: { id } })
+    }
+
+    async update({ id, data }: UpdateAccount): Promise<{ ok: boolean, error?: string }> {
         try {
-            const find = await this.users.findOne({ where: { id } })
-            if (!find) {
-                throw new NotFoundException();
+            const checkId = await this.findById(id)
+            console.log(checkId)
+            if (!checkId) {
+                return {
+                    ok: false,
+                    error: "There is no id like that"
+                }
             }
-            return find
+            await this.users.update(id, { ...data });
+            return {
+                ok: true,
+            };
         } catch (err) {
             console.log(err)
-            throw new InternalServerErrorException()
+            return {
+                ok: false,
+                error: "Couldn't update account"
+            }
+        }
+    }
+
+    async delete(id: number): Promise<{ ok: boolean, error?: string }> {
+        try {
+            const checkId = await this.findById(id)
+            console.log(checkId)
+            if (!checkId) {
+                return {
+                    ok: false,
+                    error: "There is no id like that"
+                }
+            }
+            await this.users.delete(id)
+            return {
+                ok: true
+            }
+        } catch (err) {
+            console.log(err)
+            return {
+                ok: false,
+                error: "Couldn't delete"
+            }
         }
     }
 

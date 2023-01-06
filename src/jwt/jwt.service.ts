@@ -14,8 +14,7 @@ export class JwtService {
     }
 
     verify(token: string){
-        const ver = jwt.verify(token, this.options.privateKey);
-        // console.log(token)
+        const ver = jwt.verify(token, this.options.privateKey)
         return ver
     }
 }

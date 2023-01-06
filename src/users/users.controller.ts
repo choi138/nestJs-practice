@@ -3,6 +3,7 @@ import { MutationOutput } from 'src/common/dto/output.dto';
 import { CoreEntity } from 'src/common/entites/core.entity';
 import { CreateAccount } from './dto/create-account.dto';
 import { LoginInput, LoginOutput } from './dto/login.dto';
+import { UpdateAccount } from './dto/update-account.dto';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -40,7 +41,7 @@ export class UsersController {
     }
 
     @Post('/token')
-    async Entoken(@Body() body:any) {
+    async Entoken(@Body() body: any) {
         try {
             return await this.userService.use(body.token)
         } catch (err) {
@@ -49,6 +50,32 @@ export class UsersController {
                 ok: "sorry",
                 error: err
             });
+        }
+    }
+
+    @Post('/update')
+    async update(@Body() updateAccount: UpdateAccount): Promise<MutationOutput> {
+        try {
+            return await this.userService.update(updateAccount);
+        } catch (err) {
+            console.log(err)
+            return {
+                ok: false,
+                error: err
+            }
+        }
+    }
+
+    @Post('/delete')
+    async delete(@Body() id: number): Promise<MutationOutput> {
+        try {
+            return await this.userService.delete(id)
+        } catch (err) {
+            console.log(err)
+            return {
+                ok: false,
+                error: err
+            }
         }
     }
 }
